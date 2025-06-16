@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Eye, EyeOff, Mail, KeyRound } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignInPage = () => {
   const [formValues, setFormValues] = useState({
@@ -18,6 +18,15 @@ const SignInPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleSubmit = async (e) => {
@@ -25,14 +34,16 @@ const SignInPage = () => {
     const newErrors = {};
 
     // Validation
-    if (!formValues.email) {
+    if (!formValues.email.trim()) {
       newErrors.email = "Email is required";
-    } else if (!formValues.email.includes("@")) {
-      newErrors.email = "Invalid email address";
+    } else if (!validateEmail(formValues.email)) {
+      newErrors.email = "Please enter a valid email address";
     }
 
     if (!formValues.password) {
       newErrors.password = "Password is required";
+    } else if (formValues.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
@@ -40,7 +51,7 @@ const SignInPage = () => {
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post("api/auth/login", formValues);
+      const response = await axios.post("/api/auth/login", formValues);
       const { token } = response.data;
       localStorage.setItem("authToken", token);
 
@@ -62,110 +73,128 @@ const SignInPage = () => {
   };
 
   return (
-    <div className="w-screen h-screen bg-white overflow-hidden font-[Dosis] relative">
-
-      <div className="flex w-full h-full px-5 gap-x-10">
+    <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl border border-gray-400 shadow-2xl overflow-hidden max-w-6xl w-full mx-4 flex min-h-[600px]">
         {/* Left section */}
-        <div className="w-[55%] flex items-center justify-end">
-          <form onSubmit={handleSubmit} className="w-full max-w-xl">
-            <h1 className="text-[54px] font-medium text-black mb-8 text-center">
-              Sign in
-            </h1>
-
-            {/* Email */}
-            <div className="mb-6">
-              <label className="block text-base font-medium text-gray-800 mb-3">
-                Email
-              </label>
-              <div className="relative w-[551px] h-[51.93px]">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formValues.email}
-                  onChange={handleChange}
-                  className="w-full h-full pl-12 pr-4 border border-gray-300 rounded-lg text-base bg-white placeholder-gray-400 focus:outline-none focus:border-gray-400"
-                />
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="mb-3">
-              <label className="block text-base font-medium text-gray-800 mb-3">
-                Password
-              </label>
-              <div className="relative w-[551px] h-[51.93px]">
-                <KeyRound className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formValues.password}
-                  onChange={handleChange}
-                  className="w-full h-full pl-12 pr-12 border border-gray-300 rounded-lg text-base bg-white placeholder-gray-400 focus:outline-none focus:border-gray-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
-            </div>
-
-            {/* Forgot Password */}
-            <div className="w-[551px] text-right mb-8">
-              <button
-                type="button"
-                onClick={() => navigate("/forgot-password")}
-                className="text-sm text-gray-600 hover:text-gray-700"
-              >
-                Forgot Password?
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-[378.37px] h-[55.93px] bg-[#3D3735] text-white rounded-lg text-[20px] font-medium flex items-center justify-center mx-auto mb-2 ${
-                isSubmitting
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#2D2623]"
-              } transition-colors`}
-            >
-              {isSubmitting ? "Signing in..." : "Sign in"}
-            </button>
-
-            {/* Signup  */}
-            <p className="text-base text-center text-gray-700 mt-2">
-              Don’t have an account?{" "}
-              <button
-                onClick={() => navigate("/register")}
-                className="text-blue-600 hover:text-blue-500 hover:underline"
-              >
-                Signup
-              </button>
-            </p>
-          </form>
+        <div className="w-1/2 h-full flex items-center justify-start">
+          <img src="src/assets/images/login.png" alt="Login Visual" />
         </div>
 
         {/* Right section */}
-        <div className="w-[52%] h-full flex items-center justify-start">
-          <img
-            src="src/images/login.png"
-            alt="Visual"
-             className="w-[555px] h-[676px] object-cover rounded-[60px] rounded-br-[30px]"
-          />
+        <div className="w-1/2 flex items-center justify-center p-8">
+          <div className="w-full h-full">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h1 className="text-[42px] font-dosis font-medium text-gray-800 mt-12 mb-16 text-center">
+                Login
+              </h1>
+
+              {/* Email Field */}
+              <div className="pr-6">
+                <label className="block text-md font-dosis font-semibold text-gray-700 mb-1">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formValues.email}
+                    onChange={handleChange}
+                    placeholder="abc@gmail.com"
+                    className={`w-full h-12 pl-10 font-dosis border rounded-lg text-md bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all ${
+                      errors.email
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 hover:border-gray-400"
+                    }`}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div className="pr-6">
+                <label className="block text-md font-dosis font-semibold text-gray-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formValues.password}
+                    onChange={handleChange}
+                    placeholder="********"
+                    className={`w-full h-12 pl-10 border rounded-lg text-sm bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all ${
+                      errors.password
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 hover:border-gray-400"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? (
+                      <Eye className="h-5 w-5" />
+                    ) : (
+                      <EyeOff className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                )}
+              </div>
+
+              {/* Forgot Password */}
+              <div className="text-right transform -translate-y-5">
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-[13px] font-dosis font-medium text-[#545050] hover:text-blue-500 hover:underline transition-colors pr-6"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-center">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`w-80 h-12 bg-[#4B2E2E] text-white font-dosis rounded-lg text-[20px] font-medium flex items-center justify-center transition-all ${
+                    isSubmitting
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-gray-800 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      logging in...
+                    </div>
+                  ) : (
+                    "Login"
+                  )}
+                </button>
+              </div>
+
+              {/* Sign Up Link */}
+              <p className="text-sm text-center font-dosis text-gray-600 mt-4">
+                Don't have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate("/register")}
+                  className="text-[#6646F6] hover:text-blue-500 hover:underline font-medium transition-colors"
+                >
+                  Sign Up
+                </button>
+              </p>
+            </form>
+          </div>
         </div>
       </div>
     </div>
