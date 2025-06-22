@@ -23,19 +23,17 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white shadow-md border-b">
+      <div className="max-w-full mx-auto px-6">
         <div className="flex items-center justify-between h-20">
-          
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/home" className="flex items-center">
               <img 
                 src="src/images/logo.png" 
                 alt="Logo" 
-                className="h-12 w-auto"
+                className="h-14 w-auto"
                 onError={(e) => {
-                  // Fallback if image doesn't load
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -48,52 +46,51 @@ const Navbar = () => {
           </div>
 
           {/* Center Section - Search Bar */}
-          <div className="flex-1 max-w-lg mx-8">
+          <div className="flex-1 max-w-[450px]">
             <form onSubmit={handleSearch} className="relative">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search here..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className="w-full pl-6 py-2 border font-medium font-dosis border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent outline-none transition-all"
                 />
               </div>
             </form>
           </div>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-20">
             <Link
               to="/rent"
-              className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+              className="text-gray-700 text-[20px] font-dosis hover:text-gray-900 font-medium transition-colors"
             >
               Rent
             </Link>
             <Link
               to="/packages"
-              className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+              className="text-gray-700 text-[20px] font-dosis hover:text-gray-900 font-medium transition-colors"
             >
               Packages
             </Link>
             <Link
               to="/about"
-              className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+              className="text-gray-700 text-[20px] font-dosis hover:text-gray-900 font-medium transition-colors"
             >
               About Us
             </Link>
           </div>
 
           {/* Right Icons */}
-          <div className="flex items-center space-x-4 ml-8">
+          <div className="flex items-center space-x-14 ml-8">
             {/* Shopping Cart */}
             <button
               className="text-gray-700 hover:text-gray-900 transition-colors relative"
               onClick={() => navigate("/cart")}
             >
-              <ShoppingCart className="h-6 w-6" />
-              {/* Optional cart item count badge */}
+              <ShoppingCart className="h-8 w-6" />
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 3
               </span>
@@ -104,7 +101,7 @@ const Navbar = () => {
               className="text-gray-700 hover:text-gray-900 transition-colors"
               onClick={() => navigate("/wishlist")}
             >
-              <Heart className="h-6 w-6" />
+              <Heart className="h-8 w-6" />
             </button>
 
             {/* User Profile */}
@@ -114,7 +111,7 @@ const Navbar = () => {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="text-gray-700 hover:text-gray-900 transition-colors focus:outline-none"
                 >
-                  <User className="h-6 w-6" />
+                  <User className="h-10 w-7" />
                 </button>
 
                 {dropdownOpen && (
