@@ -5,6 +5,21 @@ import PackageCards from "./PackageCard";
 const Packages = () => {
   const [ornaments, setOrnaments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [startIndex, setStartIndex] = useState(0);
+  
+  const itemsPerPage = 4;
+  const endIndex = startIndex + itemsPerPage;
+
+  const handlePrev = () => {
+    setStartIndex(Math.max(startIndex - itemsPerPage, 0));
+  };
+
+  const handleNext = () => {
+    setStartIndex(
+      Math.min(startIndex + itemsPerPage, ornaments.length - itemsPerPage)
+    );
+  };
+
 
   useEffect(() => {
     const fetchOrnaments = async () => {
@@ -26,8 +41,18 @@ const Packages = () => {
   }
 
   return (
-    <div>
-      <PackageCards section="Packages" ornaments={ornaments} />
+    <div className="flex items-center space-x-4 justify-center">
+      {startIndex > 0 && (
+        <button onClick={handlePrev} className="pagination-button">
+          <ChevronLeft className="w-6 h-6 text-gray-600" />
+        </button>
+      )}
+      <PackageCards ornaments={ornaments.slice(startIndex, endIndex)} />
+      {endIndex < ornaments.length && (
+        <button onClick={handleNext} className="pagination-button">
+          <ChevronRight className="w-6 h-6 text-gray-600" />
+        </button>
+      )}
     </div>
   );
 };
