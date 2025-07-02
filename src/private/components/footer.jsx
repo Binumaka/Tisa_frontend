@@ -1,125 +1,69 @@
 import React from "react";
-import { Compass, Send, Shield, Book, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { FaFacebookF, FaTwitter, FaInstagram, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 
-export default function Footer() {
+const Footer = () => {
   return (
-    <footer className="bg-white text-black py-6">
-      <div className="pl-20 max-w-full mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Company Info */}
-          <div className="mb-4">
-            <h3 className="text-xl font-bold mb-3 flex items-center">
-              <Compass className="mr-2" size={24} />
-              VoyageVue
-            </h3>
-            <p className="text-sm text-green-900 mb-4">
-              Adventure awaits, just one click away with VoyageVue
+    <footer className="bg-[#9e7d7d] text-white py-10 px-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+        {/* Logo & Contact */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-7">
+            <img
+              src="/src/assets/images/logo.png"
+              alt="Logo"
+              className="w-28 object-contain"
+            />
+          </div>
+          <div className="text-md space-y-4">
+            <p className="flex items-center font-dosis font-medium gap-2">
+              <FaMapMarkerAlt /> Bhaktapur, Nepal
             </p>
-            <div className="mt-4">
-              <a
-                href="/about"
-                className="bg-blue-500 hover:bg-green-500 text-white px-4 py-2 rounded text-sm inline-block mr-2"
-              >
-                About Us
-              </a>
-              <a
-                href="/contact"
-                className="bg-purple-700 hover:bg-green-500 text-white border border-purple-400 px-4 py-2 rounded text-sm inline-block"
-              >
-                Contact
-              </a>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="/privacy-policy"
-                  className="text-indigo-600 hover:text-black text-sm flex items-center"
-                >
-                  <Shield className="mr-2" size={16} /> Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/terms-of-service"
-                  className="text-indigo-600 hover:text-black text-sm flex items-center"
-                >
-                  <Book className="mr-2" size={16} /> Terms of Service
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/faq"
-                  className="text-indigo-600 hover:text-black text-sm flex items-center"
-                >
-                  <Send className="mr-2" size={16} /> FAQ
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/destinations"
-                  className="text-indigo-600 hover:text-black text-sm flex items-center"
-                >
-                  <Compass className="mr-2" size={16} /> Destinations
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social Media and Newsletter */}
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-3">Stay Connected</h3>
-            <div className="flex space-x-4 mb-4">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gray-300 hover:bg-indigo-300 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
-              >
-                <Facebook size={18} />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gray-300 hover:bg-indigo-300 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
-              >
-                <Twitter size={18} />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gray-300 hover:bg-indigo-300 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
-              >
-                <Instagram size={18} />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gray-300 hover:bg-indigo-300 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
-              >
-                <Linkedin size={18} />
-              </a>
-            </div>
+            <p className="flex items-center font-dosis font-medium gap-2">
+              <FaPhoneAlt /> 9876543210
+            </p>
+            <p className="flex items-center font-dosis font-medium gap-2">
+              <FaEnvelope /> tisa@gmail.com
+            </p>
           </div>
         </div>
 
-        {/* Bottom Section - Copyright */}
-        <div className="border-t border-black/40 mt-6 pt-4 flex flex-col md:flex-row md:justify-between items-start md:items-center">
-          <p className="text-xs text-indigo-700">
-            © {new Date().getFullYear()} VoyageVue. All Rights Reserved.
-          </p>
-          <p className="text-xs text-indigo-600 mt-2 md:mt-0">
-            Designed with <span className="text-red-400">♥</span> for travelers worldwide
-          </p>
+        {/* Quick Links */}
+        <div>
+          <h3 className="text-[22px] font-dosis font-semibold mb-3 mt-14">Quick Links</h3>
+          <ul className="space-y-2 text-md">
+            <li><a href="#" className="hover:underline font-dosis font-medium">About Us</a></li>
+            <li><a href="#" className="hover:underline font-dosis font-medium">Privacy Policy</a></li>
+            <li><a href="#" className="hover:underline font-dosis font-medium">Terms of Service</a></li>
+            <li><a href="#" className="hover:underline font-dosis font-medium">Ornaments</a></li>
+            <li><a href="#" className="hover:underline font-dosis font-medium">Rent</a></li>
+          </ul>
+        </div>
+
+        {/* Social Media */}
+        <div>
+          <h3 className="text-[22px] font-dosis font-semibold mb-3 mt-14">Stay Connected</h3>
+          <div className="flex gap-4 text-xl">
+            <a href="#" className="hover:text-gray-300"><FaFacebookF /></a>
+            <a href="#" className="hover:text-gray-300"><FaTwitter /></a>
+            <a href="#" className="hover:text-gray-300"><FaInstagram /></a>
+          </div>
+        </div>
+
+        {/* Subscribe Section */}
+        <div>
+          <h3 className="text-[22px] font-dosis font-semibold mb-3 mt-14">Get our latest updates.</h3>
+          <input
+            type="email"
+            placeholder="Enter your email address here ..."
+            className="w-full bg-transparent border-b border-white py-2 placeholder-white font-dosis text-sm mb-4 focus:outline-none"
+          />
+          <button className="bg-[#4b2e2e] text-white py-2 px-6 rounded hover:bg-[#6b3f3f] transition font-dosis text-sm">
+            SUBSCRIBE
+          </button>
         </div>
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
