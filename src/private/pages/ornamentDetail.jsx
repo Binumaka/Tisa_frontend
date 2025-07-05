@@ -1,194 +1,241 @@
-import React, { useState } from 'react';
-import { Heart, Star, Minus, Plus, ShoppingCart, CreditCard, Tag, Package } from 'lucide-react';
+import axios from "axios";
+import { Minus, Plus, Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FaHeart } from "react-icons/fa";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import Navbar from "../components/Navbar";
+import Footer from "../components/footer";
+import { useCart } from "../context/cartContext";
+import { useWishlist } from "../context/wishlistContext";
 
 const OrnamentDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+
+  const [ornament, setOrnament] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const [rating, setRating] = useState(0);
 
-  // Sample ornament data - in real app, this would come from props or API
-  const ornament = {
-    id: 1,
-    title: "Moo (Traditional bangle)",
-    price: 1000,
-    rating: 3.6,
-    weight: "25 gm",
-    category: "Ihi (Bel bibaha) and Gufa (Bara Tayegu)",
-    tags: ["Bangles"],
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop",
-    description: "Moo is a traditional Newari bangle worn by young girls during important life rituals such as Ihi (Bel Bibaha) and Barha Tayegu (Gufa). Made typically of silver or silver-plated metal, the Moo is a thick, rounded bangle that may feature simple designs or traditional motifs symbolizing purity and protection. During these ceremonies, which mark the symbolic marriage to the bel fruit and the girl's transition into womanhood, the Moo serves not only as an ornament but also as a spiritual symbol of blessings, cultural identity, and sacred transformation. Often gifted by elders, it holds emotional and cultural significance, sometimes passed down through generations as a cherished heirloom."
-  };
+  useEffect(() => {
+    const fetchOrnament = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/ornament/${id}`
+        );
+        setOrnament(response.data);
+      } catch (error) {
+        console.error("Failed to fetch ornament:", error);
+      }
+    };
+    fetchOrnament();
+  }, [id]);
 
   const handleQuantityChange = (action) => {
-    if (action === 'increase') {
-      setQuantity(prev => prev + 1);
-    } else if (action === 'decrease' && quantity > 1) {
-      setQuantity(prev => prev - 1);
-    }
+    setQuantity((prev) =>
+      action === "increase" ? prev + 1 : Math.max(1, prev - 1)
+    );
   };
 
   const handleRating = (starIndex) => {
     setRating(starIndex + 1);
   };
+  const isInWishlist = (ornamentId) =>
+    wishlist?.some(
+      (item) =>
+        item.ornamentId === ornamentId || item.ornament?._id === ornamentId
+    );
+
+  const handleWishlist = async (e, ornamentId) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const itemInWishlist = isInWishlist(ornamentId);
+
+    try {
+      if (itemInWishlist) {
+        const wishlistItem = wishlist.find(
+          (item) =>
+            item.ornamentId === ornamentId || item.ornament?._id === ornamentId
+        );
+        if (wishlistItem) {
+          await removeFromWishlist(wishlistItem._id);
+          toast.info("Removed from wishlist");
+        }
+      } else {
+        await addToWishlist(ornamentId);
+        toast.success("Added to wishlist successfully");
+      }
+    } catch (err) {
+      console.error("Wishlist action failed:", err);
+      toast.error("Wishlist action failed");
+    }
+  };
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(ornament, quantity);
+      toast.success("Item added to cart");
+    } catch (error) {
+      console.error("Failed to add to cart", error);
+      toast.error("Failed to add item to cart");
+    }
+  };
+
+  const handleBuyNow = async () => {
+    navigate("/checkout", { state: { ornament: { ...ornament, quantity } } });
+  };
+
+  if (!ornament) {
+    return (
+      <div className="text-center mt-20 text-gray-500">
+        Loading ornament details...
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Main Product Section */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
-            
-            {/* Image Section */}
-            <div className="relative">
-              <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-red-900 to-red-700 p-6 shadow-lg">
+    <>
+      <Navbar />
+      <div className="min-h-screen mt-20 bg-gray-50">
+        <div className="max-w-full mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="flex justify-center">
+              <div className="relative w-full max-w-md">
                 <img
-                  src={ornament.image}
+                  src={
+                    ornament.image
+                      ? `http://localhost:3000/ornaments_image/${ornament.image}`
+                      : "https://via.placeholder.com/400"
+                  }
                   alt={ornament.title}
-                  className="w-full h-full object-cover rounded-xl"
+                  className="w-[430px] h-[480px] rounded-lg shadow-lg"
                 />
               </div>
             </div>
 
-            {/* Product Info Section */}
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="flex justify-between items-start">
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                    {ornament.title}
-                  </h1>
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold text-gray-700">{ornament.rating}</span>
-                    </div>
-                  </div>
-                </div>
+            <div className="bg-white w-[600px] rounded-lg p-6 shadow-sm">
+              <div className="flex justify-between items-start mb-4">
+                <h1 className="text-3xl font-dosis font-semibold text-gray-900">
+                  {ornament.title}
+                </h1>
                 <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  onClick={(e) => handleWishlist(e, ornament._id)}
+                  className="p-2 bg-transparent transition-colors"
                 >
-                  <Heart 
-                    className={`w-6 h-6 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} 
-                  />
+                  {isInWishlist(ornament._id) ? (
+                    <FaHeart className="w-6 h-6 text-red-500" />
+                  ) : (
+                    <FaHeart className="w-6 h-6  text-gray-400 hover:text-red-600" />
+                  )}
                 </button>
               </div>
 
-              {/* Price */}
-              <div className="text-4xl font-bold text-red-600">
-                Rs. {ornament.price.toLocaleString()}
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-sm font-dosis font-medium text-gray-600">
+                  {ornament.rating || "4.2"}
+                </span>
               </div>
 
-              {/* Details */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Package className="w-5 h-5" />
-                  <span className="font-medium">Weight:</span>
-                  <span>{ornament.weight}</span>
+              <div className="text-2xl font-dosis font-bold text-red-500 mb-6">
+                Rs. {ornament.price}
+              </div>
+
+              <div className="space-y-3 mb-6 text-sm text-gray-600">
+                <div className="font-dosis text-[15px]">
+                  <strong className="font-dosis">Weight:</strong> {ornament.weight || "N/A"}
                 </div>
-                
-                <div className="flex items-start gap-2 text-gray-600">
-                  <Tag className="w-5 h-5 mt-0.5" />
-                  <div>
-                    <span className="font-medium">Category:</span>
-                    <span className="ml-2">{ornament.category}</span>
-                  </div>
+                <div className="font-dosis text-[15px]">
+                  <strong className="font-dosis">Category:</strong> {ornament.category || "N/A"}
                 </div>
-                
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Tag className="w-5 h-5" />
-                  <span className="font-medium">Tags:</span>
-                  <div className="flex gap-2">
-                    {ornament.tags.map((tag, index) => (
-                      <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                <div className="font-dosis text-[15px]">
+                  <strong className="font-dosis">Tags:</strong> {ornament.tags || "N/A"}
                 </div>
               </div>
 
-              {/* Quantity Selector */}
-              <div className="flex items-center gap-4">
-                <span className="font-medium text-gray-700">Quantity:</span>
-                <div className="flex items-center border-2 border-gray-200 rounded-lg">
+              <div className="flex items-center gap-14 mb-6">
+                <div className="flex w-[150px] h-[45px] px-2 rounded-lg items-center mt-6 gap-6 mb-6 border border-gray-300">
                   <button
-                    onClick={() => handleQuantityChange('decrease')}
-                    className="p-2 hover:bg-gray-100 transition-colors"
+                    onClick={() => handleQuantityChange("decrease")}
                     disabled={quantity <= 1}
+                    className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="px-4 py-2 font-semibold min-w-[3rem] text-center">
-                    {quantity}
-                  </span>
+                  <span className="text-lg font-dosis font-medium px-4">{quantity}</span>
                   <button
-                    onClick={() => handleQuantityChange('increase')}
-                    className="p-2 hover:bg-gray-100 transition-colors"
+                    onClick={() => handleQuantityChange("increase")}
+                    className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <button className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
-                  <ShoppingCart className="w-5 h-5" />
+                <button
+                  onClick={handleAddToCart}
+                  className="w-[200px] font-dosis text-lg bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-3 px-6 rounded-lg transition-colors"
+                >
                   Add to cart
                 </button>
-                <button className="flex-1 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
-                  <CreditCard className="w-5 h-5" />
+              </div>
+
+              <div className="px-14 space-y-3">
+                <button
+                  onClick={handleBuyNow}
+                  className=" w-1/2 bg-[#4B2E2E] font-dosis hover:bg-amber-900 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                >
                   Buy Now
                 </button>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Description and Rating Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Description */}
-          <div className="lg:col-span-2 bg-white rounded-3xl shadow-xl p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Description</h2>
-            <div className="prose prose-lg text-gray-700 leading-relaxed">
-              <p>{ornament.description}</p>
+          <div className="relative">
+            <div className="px-10 max-w-full">
+              <div className="bg-white border border-gray-300 rounded-lg p-6 shadow-sm mb-6">
+                <h2 className="flex justify-center text-2xl border-b font-dosis font-semibold mb-4">Description</h2>
+                <p className="text-gray-700 font-dosis text-[18px] leading-relaxed">
+                  {ornament.description || "No description available."}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Rating Section */}
-          <div className="bg-white rounded-3xl shadow-xl p-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Rate us now !!</h3>
-            <div className="flex justify-center gap-2 mb-6">
-              {[0, 1, 2, 3, 4].map((starIndex) => (
-                <button
-                  key={starIndex}
-                  onClick={() => handleRating(starIndex)}
-                  className="transition-all duration-200 hover:scale-110"
-                >
-                  <Star
-                    className={`w-8 h-8 ${
-                      starIndex < rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300 hover:text-yellow-300'
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
-            <div className="text-center">
-              <p className="text-gray-600 mb-4">
-                {rating > 0 ? `You rated: ${rating} star${rating > 1 ? 's' : ''}` : 'Click to rate'}
-              </p>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
-                Submit Review
-              </button>
+            {/* Floating Rating Box */}
+            <div className="hidden lg:block fixed top-96 right-0 w-[280px]">
+              <div className="bg-white rounded-lg p-6 shadow-md">
+                <h3 className="text-lg font-semibold mb-4 text-center">
+                  Rate us now !!
+                </h3>
+                <div className="flex justify-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleRating(i)}
+                      className="hover:scale-110 transition-all"
+                    >
+                      <Star
+                        className={`w-6 h-6 ${
+                          i < rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <div className="text-center text-gray-600 text-sm mb-2">
+                  {rating > 0
+                    ? `You rated: ${rating} star${rating > 1 ? "s" : ""}`
+                    : "Click to rate"}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
