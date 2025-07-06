@@ -5,29 +5,29 @@ const SplashPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0); // State for carousel index
   const navigate = useNavigate();
-  const currentimage = ["/src/images/firstSlider.png"];
+  const currentimage = ["/src/assets/images/firstSlider.png"];
 
   // Destinations data
   const ornaments = [
     {
       id: 1,
       title: "What is wore in Ihi ceremony",
-      image: "/src/images/ihi.png",
+      image: "/src/assets/images/ihi.png",
     },
     {
       id: 2,
       title: "Discover the best of Bhaktapur",
-      image: "/src/images/gufa.png",
+      image: "/src/assets/images/gufa.png",
     },
     {
       id: 3,
       title: "Trip to the Wildlife",
-      image: "/src/images/mariage.png",
+      image: "/src/assets/images/mariage.png",
     },
     {
       id: 4,
       title: "Winter in Mustang",
-      image: "/src/images/janku.png",
+      image: "/src/assets/images/janku.png",
     },
   ];
 
@@ -35,19 +35,19 @@ const SplashPage = () => {
   const Topdestination = [
     {
       id: 1,
-      image: "/src/images/marwari.png",
+      image: "/src/assets/images/marwari.png",
     },
     {
       id: 2,
-      image: "/src/images/makasi.png",
+      image: "/src/assets/images/makasi.png",
     },
     {
       id: 3,
-      image: "/src/images/tayo.png",
+      image: "/src/assets/images/tayo.png",
     },
     {
       id: 4,
-      image: "/src/images/Naypushikha.png",
+      image: "/src/assets/images/Naypushikha.png",
     },
   ];
 
@@ -68,7 +68,7 @@ const SplashPage = () => {
       >
         <div className="flex items-center justify-between px-10 py-4">
           <img
-            src="/src/images/logo.png"
+            src="/src/assets/images/logo.png"
             alt="Logo"
             className="h-[60px] w-[114px]"
           />
@@ -147,9 +147,9 @@ const SplashPage = () => {
           {/* Right Image Section */}
           <div className="flex-1 grid grid-cols-3 gap-28">
             {[
-              { src: "/src/images/tayo2.png"},
-              { src: "/src/images/makasi1.png"},
-              { src: "/src/images/naypushikha1.png"},
+              { src: "/src/assets/images/tayo2.png" },
+              { src: "/src/assets/images/makasi1.png" },
+              { src: "/src/assets/images/naypushikha1.png" },
             ].map((item, index) => (
               <div
                 key={index}
@@ -194,31 +194,32 @@ const SplashPage = () => {
       {/* Features Section */}
       <div className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Expert Artisans</h3>
-              <p className="text-gray-600">
-                Our jewelry is lovingly crafted by skilled artisans who have
-                inherited traditional techniques passed down through
-                generations.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Seamless Purchase</h3>
-              <p className="text-gray-600">
-                Whether it's for Ihi, Gufa, weddings, festivals, or daily wear,
-                our collection blends ceremonial importance with modern comfort
-                and elegance.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Purchase Packages</h3>
-              <p className="text-gray-600">
-                Choose from our culturally rich sets ideal for birthdays,
-                weddings, and coming-of-age ceremonies like Bel Bibaha or Barha
-                Tayegu.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-20">
+            {[
+              {
+                title: "Expert Artisans",
+                description:
+                  "Our jewelry is lovingly crafted by skilled artisans who have inherited traditional techniques passed down through generations.",
+              },
+              {
+                title: "Seamless Purchase",
+                description:
+                  "Whether it’s for Ihi, Gufa, weddings, festivals, or daily wear, our collection blends ceremonial importance with modern comfort and elegance.",
+              },
+              {
+                title: "Purchase Packages",
+                description:
+                  "Choose from our culturally rich sets ideal for birthdays, weddings, and coming-of-age ceremonies like Bel Bibaha or Barha Tayegu.",
+              },
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-br from-[#B67D7D] to-[#9C5F5F] text-white text-center p-6 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02]"
+              >
+                <h1 className="text-[20px] text-black font-medium font-dosis">{feature.title}</h1>
+                <p className="text-[16px] font-dosis">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

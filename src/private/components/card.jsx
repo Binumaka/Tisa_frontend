@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
-const PackageCard = ({ ornaments }) => {
+const RentCard = ({ ornaments }) => {
   const navigate = useNavigate();
 
-  const gotoPackagesDetails = (id) => {
-    navigate(`/packageDetail/${id}`);
+  const gotoRentDetails = (id) => {
+    navigate(`/rentDetails/${id}`);
   };
 
   return (
@@ -18,13 +18,13 @@ const PackageCard = ({ ornaments }) => {
                 <div
                   key={ornament._id}
                   className="group relative w-full max-w-[280px] h-[360px] rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer mx-auto"
-                  onClick={() => gotoPackagesDetails(ornament._id)}
+                  onClick={() => gotoRentDetails(ornament._id)}
                 >
                   {/* Image Container */}
                   <div className="w-full h-full relative">
                     {ornament.image ? (
                       <img
-                        src={`http://localhost:3000/ornaments_image/${ornament.image}`}
+                        src={`http://localhost:3000/uploads/${ornament.image}`}
                         alt={ornament.title || "Ornament"}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
@@ -63,4 +63,4 @@ const PackageCard = ({ ornaments }) => {
   );
 };
 
-export default PackageCard;
+export default RentCard;

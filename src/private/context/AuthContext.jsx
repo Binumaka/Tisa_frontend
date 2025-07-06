@@ -1,62 +1,73 @@
-import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { createContext, useContext, useEffect, useState } from "react";
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState("");
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState(localStorage.getItem("authToken") || null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const savedUserId = localStorage.getItem("userId");
 
-    if (token && savedUserId) {
-      setIsLoggedIn(true);
-      setUserId(savedUserId);
-    } else if (token) {
-      fetchUserData(token);
-    }
-  }, []);
-
-  const fetchUserData = async (token) => {
+  const isTokenExpired = (token) => {
     try {
-      const response = await axios.get(`/api/auth/users`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      
-      if (data && data.userId) {
-        localStorage.setItem("userId", data.userId);
-        setUserId(data.userId);
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-      setIsLoggedIn(false);
-      setToken(null);
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.exp * 1000 < Date.now();
+    } catch (e) {
+      return true; 
     }
   };
 
-  const login = (token) => {
-    if (!token) {
+  useEffect(() => {
+    if (token) {
+      if (isTokenExpired(token)) {
+        console.warn("Token expired");
+        logout();
+        return;
+      }
+
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(`/api/auth/users`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = response.data;
+
+          if (data && data._id) {
+            localStorage.setItem("userId", data._id);
+            setUserId(data._id);
+            setIsLoggedIn(true);
+          } else {
+            setIsLoggedIn(false);
+            logout();
+          }
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+          logout(); // cleanup if token invalid
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchUserData();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const login = (newToken) => {
+    if (!newToken) {
       console.error("Missing token");
       return;
     }
 
-    localStorage.setItem("authToken", token);
-    fetchUserData(token); // Fetch user ID after login
+    localStorage.setItem("authToken", newToken);
+    setToken(newToken);
   };
 
   const logout = () => {
@@ -64,10 +75,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("userId");
     setIsLoggedIn(false);
     setUserId("");
+    setToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userId, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userId, login, logout, token, loading }}>
       {children}
     </AuthContext.Provider>
   );
