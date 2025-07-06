@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import OrnamentCard from "./OrnamentCard";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 const FeaturedOrnament = () => {
   const [ornaments, setOrnaments] = useState([]);

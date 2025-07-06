@@ -73,7 +73,7 @@ const OrnamentCard = ({ ornaments = [] }) => {
   }
 
   return (
-    <div className="flex flex-wrap justify-center gap-24 w-full p-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
       {ornaments.length > 0 ? (
         ornaments.map((ornament) => {
           if (!ornament || !ornament._id) return null;

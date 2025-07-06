@@ -18,14 +18,14 @@ const OrnamentDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const [rating, setRating] = useState(0);
+  const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
     const fetchOrnament = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/ornament/${id}`
-        );
+        const response = await axios.get(`http://localhost:3000/api/ornament/${id}`);
         setOrnament(response.data);
+        setSelectedImage(response.data.image); // default image
       } catch (error) {
         console.error("Failed to fetch ornament:", error);
       }
@@ -42,6 +42,7 @@ const OrnamentDetails = () => {
   const handleRating = (starIndex) => {
     setRating(starIndex + 1);
   };
+
   const isInWishlist = (ornamentId) =>
     wishlist?.some(
       (item) =>
@@ -73,6 +74,7 @@ const OrnamentDetails = () => {
       toast.error("Wishlist action failed");
     }
   };
+
   const handleAddToCart = async () => {
     try {
       await addToCart(ornament, quantity);
@@ -95,26 +97,48 @@ const OrnamentDetails = () => {
     );
   }
 
+  const imageList = [ornament.image, ornament.image1, ornament.image2].filter(Boolean);
+
   return (
     <>
       <Navbar />
       <div className="min-h-screen mt-20 bg-gray-50">
         <div className="max-w-full mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center">
               <div className="relative w-full max-w-md">
                 <img
                   src={
-                    ornament.image
-                      ? `http://localhost:3000/ornaments_image/${ornament.image}`
+                    selectedImage
+                      ? `http://localhost:3000/ornaments_image/${selectedImage}`
                       : "https://via.placeholder.com/400"
                   }
                   alt={ornament.title}
-                  className="w-[430px] h-[480px] rounded-lg shadow-lg"
+                  className="w-[430px] h-[480px] rounded-lg shadow-lg object-cover"
                 />
+              </div>
+
+              {/* Thumbnail Selector */}
+              <div className="flex gap-2 mt-4 justify-center">
+                {imageList.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(img)}
+                    className={`w-16 h-16 rounded border-2 ${
+                      selectedImage === img ? "border-yellow-500" : "border-gray-300"
+                    }`}
+                  >
+                    <img
+                      src={`http://localhost:3000/ornaments_image/${img}`}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover rounded"
+                    />
+                  </button>
+                ))}
               </div>
             </div>
 
+            {/* Right-side details */}
             <div className="bg-white w-[600px] rounded-lg p-6 shadow-sm">
               <div className="flex justify-between items-start mb-4">
                 <h1 className="text-3xl font-dosis font-semibold text-gray-900">
@@ -204,9 +228,7 @@ const OrnamentDetails = () => {
             {/* Floating Rating Box */}
             <div className="hidden lg:block fixed top-96 right-0 w-[280px]">
               <div className="bg-white rounded-lg p-6 shadow-md">
-                <h3 className="text-lg font-semibold mb-4 text-center">
-                  Rate us now !!
-                </h3>
+                <h3 className="text-lg font-semibold mb-4 text-center">Rate us now !!</h3>
                 <div className="flex justify-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <button
@@ -216,9 +238,7 @@ const OrnamentDetails = () => {
                     >
                       <Star
                         className={`w-6 h-6 ${
-                          i < rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
+                          i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
                         }`}
                       />
                     </button>

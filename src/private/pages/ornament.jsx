@@ -41,9 +41,11 @@ const OrnamentDisplay = () => {
         >
           All Ornaments
         </div>
-        <OrnamentCard ornaments={ornaments} />
+        <div className="mt-8 pl-10">
+          <OrnamentCard ornaments={ornaments} />
+        </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
