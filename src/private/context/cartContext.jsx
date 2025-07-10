@@ -16,7 +16,7 @@ export const CartProvider = ({ children }) => {
       const response = await axios.get(`/api/cart/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCart(response.data);
+      setCart(response.data.items || []);
     } catch (error) {
       console.error("Failed to fetch cart. Please try again.", error);
       setError("Failed to fetch cart. Please try again.");
@@ -32,43 +32,58 @@ export const CartProvider = ({ children }) => {
     }
   }, [userId]);
 
-  //  Add to Cart
-  const addToCart = async (ornament, quantity = 1) => {
-    try {
-      const response = await axios.post(
-        "/api/cart/save",
-        { userId, ornament, quantity },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setCart(response.data?.items || []);
-    } catch (err) {
-      console.error("Add to cart failed:", err);
-      setError("Failed to add item to cart.");
-    }
-  };
+  // Add to Cart
+const addToCart = async (ornament, quantity = 1) => {
+  if (!userId || !ornament) {
+    console.error("Missing userId or ornament object");
+    setError("Invalid user or ornament");
+    return;
+  }
 
-  //  Remove from Cart
-  const removeFromCart = async (CartId) => {
-    try {
-      await axios.delete(`/api/cart/${CartId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
+    console.log("Adding to cart:", {
+      userId,
+      ornamentId: ornament._id || ornament,
+      quantity,
+    });
 
-      setCart((prev) => prev.filter((cart) => cart._id !== CartId));
-    } catch (error) {
-      console.error("Error deleting cart item", error);
-    }
-  };
+    const response = await axios.post(
+      "/api/cart/save",
+      {
+        userId,
+        ornamentId: ornament._id || ornament, // handles if it's full object or just ID
+        quantity,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    console.log("Cart updated successfully:", response.data);
+
+    setCart(response.data?.items);
+  } catch (err) {
+    console.error(" Add to cart failed:", err.response?.data || err.message);
+    setError("Failed to add item to cart.");
+  }
+};
+
+const removeFromCart = async (ornamentId) => {
+  try {
+    await axios.delete(`/api/cart/${userId}/${ornamentId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setCart((prev) => prev.filter((item) => item.ornament._id !== ornamentId));
+  } catch (error) {
+    console.error("Error deleting cart item", error);
+  }
+};
 
   return (
     <CartContext.Provider
       value={{
         cart,
-        setCart, // ✅ Important for updating cart quantity manually
+        setCart, // Important for updating cart quantity manually
         loading,
         error,
         addToCart,
