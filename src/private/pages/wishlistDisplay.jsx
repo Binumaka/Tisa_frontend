@@ -1,70 +1,18 @@
-import axios from "axios";
 import { Trash } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/wishlistContext";
 
 const WishListScreen = () => {
-  const [wishList, setWishList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const { userId, token } = useAuth();
   const navigate = useNavigate();
+  const {
+    wishlist,
+    loading,
+    removeFromWishlist,
+  } = useWishlist();
 
   const gotoOrnamentDetails = (id) => {
     navigate(`/ornamentDetail/${id}`);
-  };
-
-  useEffect(() => {
-    if (!userId) {
-      setError("User ID is missing. Unable to fetch wishlist.");
-      setLoading(false);
-      return;
-    }
-
-    const fetchWishList = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          console.error("No authentication token found. Redirecting to login.");
-          return;
-        }
-
-        const response = await axios.get(`/api/wishlist/user/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setWishList(response.data);
-      } catch (error) {
-        setError(
-          error.response?.data?.error ||
-            "Failed to fetch wishlist. Please try again."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWishList();
-  }, [userId]);
-
-  const handleDelete = async (WishlistId) => {
-    try {
-      await axios.delete(`/api/wishlist/${WishlistId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setWishList((prev) =>
-        prev.filter((wishlist) => wishlist._id !== WishlistId)
-      );
-    } catch (error) {
-      console.error("Error deleting wishlist item", error);
-    }
   };
 
   if (loading) {
@@ -107,7 +55,7 @@ const WishListScreen = () => {
           </div>
         </div>
 
-        {wishList.length === 0 ? (
+        {wishlist.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-xl text-gray-600 mb-4">Your wishlist is empty</p>
             <p className="text-gray-500">
@@ -116,8 +64,8 @@ const WishListScreen = () => {
           </div>
         ) : (
           <div className="space-y-6 px-8 pr-6">
-            {wishList.map((item) => {
-              const ornament = item.ornamentId; // populated data
+            {wishlist.map((item) => {
+              const ornament = item.ornament;
 
               return (
                 <div
@@ -141,8 +89,7 @@ const WishListScreen = () => {
                     <p className="text-gray-600 font-dosis text-[16px] mt-2 pr-8">
                       {ornament?.description?.slice(0, 270)}...
                       <span className="text-black font-dosis font-medium cursor-pointer hover:underline hover:text-blue-600">
-                        {" "}
-                        Read more
+                        {" "}Read more
                       </span>
                     </p>
                     <p className="text-red-600 font-dosis font-semibold mt-6">
@@ -152,7 +99,7 @@ const WishListScreen = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(item._id);
+                      removeFromWishlist(ornament._id);
                     }}
                     title="Remove"
                     className="text-red-500 hover:text-red-700 pr-[50px] text-xl"

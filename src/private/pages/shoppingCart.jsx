@@ -16,11 +16,14 @@ const CartScreen = () => {
     setCart(updated);
   };
 
-  const handleRemove = (CartId) => {
-    removeFromCart(CartId);
+  const handleRemove = async (ornamentId) => {
+  try {
+    await removeFromCart(ornamentId);
     toast.success("Item removed from cart!");
-  };
-
+  } catch (error) {
+    toast.error("Failed to remove item.");
+  }
+};
   const getTotal = () => {
     return cart.reduce(
       (sum, item) => sum + (item?.ornament?.price || 0) * item.quantity,
@@ -127,7 +130,7 @@ const CartScreen = () => {
                     <div className="text-black font-dosis pl-6">Rs. {ornament.price}</div>
                     <div className="text-center pr-7">
                       <button
-                        onClick={() => handleRemove(item._id)}
+                        onClick={() => handleRemove(ornament._id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash />

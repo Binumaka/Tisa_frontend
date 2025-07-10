@@ -1,16 +1,17 @@
-// src/pages/CheckoutPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Footer from "../components/footer";
 import NavBar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/cartContext";
-import Footer from "../components/footer";
+import axios from "axios";
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { userId, token } = useAuth();
   const { cart } = useCart();
+
   let checkoutItems = [];
 
   if (location.state?.bundle) {
@@ -38,8 +39,30 @@ const CheckoutPage = () => {
     phone: "",
     email: "",
   });
+
   const [selectedPayment, setSelectedPayment] = useState("");
   const [selectedShipping, setSelectedShipping] = useState("");
+
+  // Fetch email from backend
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`/api/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFormData((prev) => ({
+          ...prev,
+          email: res.data.email,
+        }));
+      } catch (error) {
+        console.error("Failed to fetch user email", error);
+      }
+    };
+
+    if (userId && token) {
+      fetchUser();
+    }
+  }, [userId, token]);
 
   const handleInputChange = (e) => {
     setFormData((prev) => ({
@@ -83,12 +106,20 @@ const CheckoutPage = () => {
       paymentStatus = "PAID";
     }
 
+    const items = checkoutItems.map((item) => {
+      const ornament = item.ornament || item;
+      return {
+        ornamentId: ornament._id,
+        title: ornament.title,
+        price: ornament.price,
+        image: ornament.image,
+        quantity: item.quantity,
+      };
+    });
+
     const orderData = {
       userId,
-      items: checkoutItems.map((item) => ({
-        ornamentId: item.ornament._id,
-        quantity: item.quantity,
-      })),
+      items,
       shipping: {
         method: selectedShipping,
         cost: shippingCost,
@@ -105,7 +136,12 @@ const CheckoutPage = () => {
       orderDate: new Date(),
     };
 
-    navigate("/order", { state: { orderData } });
+    navigate("/order", {
+      state: {
+        orderData,
+        fromCart: !location.state?.ornament && !location.state?.bundle,
+      },
+    });
   };
 
   return (
@@ -127,7 +163,7 @@ const CheckoutPage = () => {
         <div className="container mx-auto px-4 py-4 flex flex-col lg:flex-row gap-8">
           {/* Billing Details */}
           <div className="w-full lg:w-1/2">
-            <h2 className=" flex justify-center text-2xl font-dosis font-semibold mb-4">
+            <h2 className="flex justify-center text-2xl font-dosis font-semibold mb-4">
               Billing Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
@@ -172,31 +208,14 @@ const CheckoutPage = () => {
               onChange={handleInputChange}
               className="border w-full px-4 py-2 mb-6"
             >
-              <option value="" className="text-lg font-dosis font-medium">
-                Province
-              </option>
-              <option value="Province 1" className="text-lg font-dosis font-medium">
-                Province 1
-              </option>
-              <option value="Province 2" className="text-lg font-dosis font-medium">
-                Province 2
-              </option>
-              <option value="Province 3" className="text-lg font-dosis font-medium">
-                Province 3
-              </option>
-              <option value="Province 4" className="text-lg font-dosis font-medium">
-                Province 4
-              </option>
-              <option value="Province 5" className="text-lg font-dosis font-medium">
-                Province 5
-              </option>
-              <option value="Province 6" className="text-lg font-dosis font-medium">
-                Province 6
-              </option>
-              <option value="Province 7" className="text-lg font-dosis font-medium">
-                Province 7
-              </option>
-              \
+              <option value="">Province</option>
+              <option value="Province 1">Province 1</option>
+              <option value="Province 2">Province 2</option>
+              <option value="Province 3">Province 3</option>
+              <option value="Province 4">Province 4</option>
+              <option value="Province 5">Province 5</option>
+              <option value="Province 6">Province 6</option>
+              <option value="Province 7">Province 7</option>
             </select>
             <input
               name="phone"
@@ -209,14 +228,14 @@ const CheckoutPage = () => {
               name="email"
               placeholder="Email"
               value={formData.email}
-              onChange={handleInputChange}
-              className="border w-full px-4 py-2 mb-6 text-lg font-dosis font-medium"
+              readOnly
+              className="border w-full px-4 py-2 mb-6 text-lg font-dosis font-medium bg-gray-100 text-gray-500 cursor-not-allowed"
             />
           </div>
 
           {/* Order Summary */}
           <div className="w-full lg:w-1/2 border p-6 rounded">
-            <h2 className=" flex justify-center text-2xl font-dosis font-semibold border-b border-gray-100 mb-4">
+            <h2 className="flex justify-center text-2xl font-dosis font-semibold border-b border-gray-100 mb-4">
               Your Order
             </h2>
             {checkoutItems.map((item) => (
@@ -224,7 +243,7 @@ const CheckoutPage = () => {
                 key={item.ornament._id}
                 className="flex justify-between items-center mb-4"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-8">
                   <img
                     src={
                       item.ornament?.image
@@ -238,7 +257,10 @@ const CheckoutPage = () => {
                     {item.ornament?.title}
                   </div>
                 </div>
-                <div className="text-md font-dosis font-medium text-red-600">
+                <div className="flex gap-24 text-md font-dosis font-medium text-red-600">
+                  <p className="text-md font-dosis font-medium text-gray-600">
+                    Quantity: x {item.quantity}
+                  </p>
                   Rs. {item.ornament?.price * item.quantity}
                 </div>
               </div>
@@ -247,13 +269,10 @@ const CheckoutPage = () => {
             <p>Subtotal: Rs. {calculateSubtotal()}</p>
             <p>Shipping: Rs. {shippingCost}</p>
             <p className="font-bold">Total: Rs. {total}</p>
+
             <div className="mt-4">
               <h3 className="mb-2">Shipping Method</h3>
-              {[
-                "INSIDE_THE_VALLEY",
-                "OUTSIDE_THE_VALLEY",
-                "IN_STORE_PICKUP",
-              ].map((s) => (
+              {["INSIDE_THE_VALLEY", "OUTSIDE_THE_VALLEY", "IN_STORE_PICKUP"].map((s) => (
                 <label key={s} className="block">
                   <input
                     type="radio"
@@ -266,6 +285,7 @@ const CheckoutPage = () => {
                 </label>
               ))}
             </div>
+
             <div className="mt-4">
               <h3 className="mb-2">Payment Method</h3>
               {["cod", "esewa", "khalti"].map((p) => (
@@ -281,19 +301,21 @@ const CheckoutPage = () => {
                 </label>
               ))}
             </div>
+
             <div className="flex justify-center">
-            <button
-              onClick={handleSubmit}
-              className=" mt-6 bg-[#4B2E2E] font-dosis font-semibold text-white w-[300px] px-4 py-2 rounded"
-            >
-              {selectedPayment
-                ? `Pay with ${selectedPayment.toUpperCase()}`
-                : "Place Order"}
-            </button></div>
+              <button
+                onClick={handleSubmit}
+                className="mt-6 bg-[#4B2E2E] font-dosis font-semibold text-white w-[300px] px-4 py-2 rounded"
+              >
+                {selectedPayment
+                  ? `Pay with ${selectedPayment.toUpperCase()}`
+                  : "Place Order"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

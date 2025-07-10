@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../components/Navbar";
 import Footer from "../components/footer";
+import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/cartContext";
 import { useWishlist } from "../context/wishlistContext";
 
@@ -13,7 +14,7 @@ const OrnamentDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-
+  const { userId } = useAuth();
   const [ornament, setOrnament] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
@@ -23,7 +24,9 @@ const OrnamentDetails = () => {
   useEffect(() => {
     const fetchOrnament = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/ornament/${id}`);
+        const response = await axios.get(
+          `http://localhost:3000/api/ornament/${id}`
+        );
         setOrnament(response.data);
         setSelectedImage(response.data.image); // default image
       } catch (error) {
@@ -75,7 +78,7 @@ const OrnamentDetails = () => {
     }
   };
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (ornament) => {
     try {
       await addToCart(ornament, quantity);
       toast.success("Item added to cart");
@@ -97,7 +100,9 @@ const OrnamentDetails = () => {
     );
   }
 
-  const imageList = [ornament.image, ornament.image1, ornament.image2].filter(Boolean);
+  const imageList = [ornament.image, ornament.image1, ornament.image2].filter(
+    Boolean
+  );
 
   return (
     <>
@@ -125,7 +130,9 @@ const OrnamentDetails = () => {
                     key={index}
                     onClick={() => setSelectedImage(img)}
                     className={`w-16 h-16 rounded border-2 ${
-                      selectedImage === img ? "border-yellow-500" : "border-gray-300"
+                      selectedImage === img
+                        ? "border-yellow-500"
+                        : "border-gray-300"
                     }`}
                   >
                     <img
@@ -169,13 +176,16 @@ const OrnamentDetails = () => {
 
               <div className="space-y-3 mb-6 text-sm text-gray-600">
                 <div className="font-dosis text-[15px]">
-                  <strong className="font-dosis">Weight:</strong> {ornament.weight || "N/A"}
+                  <strong className="font-dosis">Weight:</strong>{" "}
+                  {ornament.weight || "N/A"}
                 </div>
                 <div className="font-dosis text-[15px]">
-                  <strong className="font-dosis">Category:</strong> {ornament.category || "N/A"}
+                  <strong className="font-dosis">Category:</strong>{" "}
+                  {ornament.category || "N/A"}
                 </div>
                 <div className="font-dosis text-[15px]">
-                  <strong className="font-dosis">Tags:</strong> {ornament.tags || "N/A"}
+                  <strong className="font-dosis">Tags:</strong>{" "}
+                  {ornament.tags || "N/A"}
                 </div>
               </div>
 
@@ -188,7 +198,9 @@ const OrnamentDetails = () => {
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="text-lg font-dosis font-medium px-4">{quantity}</span>
+                  <span className="text-lg font-dosis font-medium px-4">
+                    {quantity}
+                  </span>
                   <button
                     onClick={() => handleQuantityChange("increase")}
                     className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
@@ -197,7 +209,7 @@ const OrnamentDetails = () => {
                   </button>
                 </div>
                 <button
-                  onClick={handleAddToCart}
+                  onClick={() => handleAddToCart(ornament._id)}
                   className="w-[200px] font-dosis text-lg bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-3 px-6 rounded-lg transition-colors"
                 >
                   Add to cart
@@ -218,7 +230,9 @@ const OrnamentDetails = () => {
           <div className="relative">
             <div className="px-10 max-w-full">
               <div className="bg-white border border-gray-300 rounded-lg p-6 shadow-sm mb-6">
-                <h2 className="flex justify-center text-2xl border-b font-dosis font-semibold mb-4">Description</h2>
+                <h2 className="flex justify-center text-2xl border-b font-dosis font-semibold mb-4">
+                  Description
+                </h2>
                 <p className="text-gray-700 font-dosis text-[18px] leading-relaxed">
                   {ornament.description || "No description available."}
                 </p>
@@ -228,7 +242,9 @@ const OrnamentDetails = () => {
             {/* Floating Rating Box */}
             <div className="hidden lg:block fixed top-96 right-0 w-[280px]">
               <div className="bg-white rounded-lg p-6 shadow-md">
-                <h3 className="text-lg font-semibold mb-4 text-center">Rate us now !!</h3>
+                <h3 className="text-lg font-semibold mb-4 text-center">
+                  Rate us now !!
+                </h3>
                 <div className="flex justify-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <button
@@ -238,7 +254,9 @@ const OrnamentDetails = () => {
                     >
                       <Star
                         className={`w-6 h-6 ${
-                          i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                          i < rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
                         }`}
                       />
                     </button>
