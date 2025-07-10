@@ -3,13 +3,13 @@ import React from "react";
 import { FaHeart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useWishlist } from "../context/wishlistContext";
 import { useCart } from "../context/cartContext";
+import { useWishlist } from "../context/wishlistContext";
 
 const OrnamentCard = ({ ornaments = [] }) => {
   const [loading, setLoading] = React.useState(false);
-  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  const {addToCart } = useCart();
+  const { wishlist, toggleWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
 
   const gotoOrnamentDetails = (id) => {
@@ -17,32 +17,18 @@ const OrnamentCard = ({ ornaments = [] }) => {
   };
 
   const isInWishlist = (ornamentId) =>
-    wishlist?.some(
-      (item) =>
-        item.ornamentId === ornamentId || item.ornament?._id === ornamentId
-    );
+    wishlist?.some((item) => item.ornament?._id === ornamentId);
 
   const handleWishlist = async (e, ornamentId) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const itemInWishlist = isInWishlist(ornamentId);
-
     try {
-      if (itemInWishlist) {
-        const wishlistItem = wishlist.find(
-          (item) =>
-            item.ornamentId === ornamentId ||
-            item.ornament?._id === ornamentId
-        );
-        if (wishlistItem) {
-          await removeFromWishlist(wishlistItem._id);
-          toast.info("Removed from wishlist");
-        }
-      } else {
-        await addToWishlist(ornamentId);
-        toast.success("Added to wishlist successfully");
-      }
+      await toggleWishlist(ornamentId);
+      const message = isInWishlist(ornamentId)
+        ? "Removed from wishlist"
+        : "Added to wishlist";
+      toast.success(message);
     } catch (err) {
       console.error("Wishlist action failed:", err);
       toast.error("Wishlist action failed");
