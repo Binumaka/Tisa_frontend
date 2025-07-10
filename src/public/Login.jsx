@@ -65,6 +65,7 @@ const SignInPage = () => {
           navigate("/admin");
         } else {
           navigate("/dashboard");
+          window.location.reload();
         }
       }, 2000);
     } catch (error) {
