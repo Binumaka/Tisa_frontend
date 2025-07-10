@@ -13,10 +13,10 @@ export const WishlistProvider = ({ children }) => {
   // Fetch Wishlist Items
   const fetchWishlist = async () => {
     try {
-      const response = await axios.get(`/api/Wishlist/user/${userId}`, {
+      const response = await axios.get(`/api/wishlist/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setWishlist(response.data);
+      setWishlist(response.data?.items || []);
     } catch (error) {
       console.error("Failed to fetch Wishlist. Please try again.", error);
       setError("Failed to fetch Wishlist. Please try again.");
@@ -25,47 +25,61 @@ export const WishlistProvider = ({ children }) => {
     }
   };
 
-  // Fetch Wishlist when token or userId changes
   useEffect(() => {
     if (userId) {
       fetchWishlist();
     }
   }, [userId]);
 
-  //  Add to Wishlist
+  // Add to Wishlist
   const addToWishlist = async (ornamentId) => {
-    try {
-      const res = await axios.post(
-        "http://localhost:3000/api/wishlist/",
-        { userId,ornamentId },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setWishlist((prev) => [...prev, res.data]);
-    } catch (err) {
-      console.error("Add to wishlist failed", err);
-      setError("Failed to add item to wishlist.");
-    }
-  };
+  try {
+    console.log("Adding to wishlist:", {
+      userId,
+      ornamentId
+    });
 
-  //  Remove from Wishlist
-  const removeFromWishlist = async (WishlistId) => {
+    const response = await axios.post(
+      "/api/wishlist/save",
+      {
+        userId,
+        items: [{ ornament: ornamentId }],
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    console.log("Wishlist updated successfully:", response.data);
+
+    setWishlist(response.data?.items);
+  } catch (err) {
+    console.error(" Add to Wishlist failed:", err.response?.data || err.message);
+    setError("Failed to add item to Wishlist.");
+  }
+};
+
+  // Remove from Wishlist
+  const removeFromWishlist = async (ornamentId) => {
     try {
-      await axios.delete(`/api/wishlist/${WishlistId}`, {
+      const response = await axios.delete(`/api/wishlist/${userId}/${ornamentId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        data:{ornamentId}
       });
-      setWishlist((prev) => prev.filter((wishlist) => wishlist._id !== WishlistId));
+      // Update local wishlist by filtering out removed ornament
+      setWishlist(response.data?.items || []);
     } catch (error) {
       console.error("Error deleting wishlist item", error);
+      setError("Failed to remove item from wishlist.");
     }
   };
 
+  // Toggle Wishlist
   const toggleWishlist = async (ornamentId) => {
     const isWishlisted = wishlist.some(
-      (item) => item.ornament?._id === ornamentId || item._id === ornamentId
+      (item) => item.ornament?._id === ornamentId || item._id ===ornamentId
     );
     if (isWishlisted) {
       await removeFromWishlist(ornamentId);
