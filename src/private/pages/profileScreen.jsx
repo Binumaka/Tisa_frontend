@@ -1,30 +1,27 @@
 import axios from "axios";
 import {
+  Calendar,
   Camera,
   Clock,
   Edit3,
   Home,
+  LogOut,
   Mail,
   Package,
   Save,
   ShoppingBag,
-  X,
-  LogOut,
   Trash2,
   User,
-  Calendar,
-  Star,
-  TrendingUp,
-  Shield,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/footer";
+import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
 
 const ProfilePage = () => {
-  const { userId, token , logout} = useAuth();
+  const { userId, token, logout } = useAuth();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [purchaseOrders, setPurchaseOrders] = useState([]);
@@ -97,56 +94,79 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("username", formData.username);
-      formDataToSend.append("email", formData.email);
-
       if (imageFile) {
+        // If image is selected, upload using multipart
+        const formDataToSend = new FormData();
+        formDataToSend.append("username", formData.username);
+        formDataToSend.append("email", formData.email);
         formDataToSend.append("image", imageFile);
-      }
 
-      const { data } = await axios.post(
-        `/api/auth/imageupload`,
-        formDataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+        const { data } = await axios.post(
+          `/api/auth/imageupload`,
+          formDataToSend,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        setUser(data.user);
+      } else {
+        // If no image selected, send a normal JSON update
+        const { data } = await axios.put(
+          `/api/user/${userId}`,
+          {
+            username: formData.username,
+            email: formData.email,
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      setUser(data.user);
+        setUser(data.user);
+      }
+      window.location.reload();
       setEditing(false);
       setImageFile(null);
       setImagePreview(null);
+      alert("Profile updated successfully.");
     } catch (err) {
       console.error("Error updating profile:", err);
       alert("Failed to update profile.");
     }
   };
 
-const handleLogout = () => {
-  logout();
- navigate("/") 
-};
-
-const handleDeleteAccount = async () => {
-  if (!window.confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
-
-  try {
-    await axios.delete(`/api/user/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    alert("Account deleted successfully.");
+  const handleLogout = () => {
     logout();
-    window.location.href = "/";
-  } catch (err) {
-    console.error("Error deleting account:", err);
-    alert("Failed to delete account.");
-  }
-};
+    navigate("/");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete your account? This cannot be undone."
+      )
+    )
+      return;
+
+    try {
+      await axios.delete(`/api/user/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert("Account deleted successfully.");
+      logout();
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Error deleting account:", err);
+      alert("Failed to delete account.");
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -187,7 +207,7 @@ const handleDeleteAccount = async () => {
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full -translate-y-32 translate-x-32 opacity-30"></div>
-          
+
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row items-center gap-8">
               <div className="flex flex-col items-center">
@@ -196,7 +216,9 @@ const handleDeleteAccount = async () => {
                   <div className="w-36 h-36 rounded-full overflow-hidden bg-gradient-to-br from-blue-200 to-purple-200 flex items-center justify-center shadow-xl ring-4 ring-white">
                     {imagePreview || user?.image ? (
                       <img
-                        src={imagePreview || `http://localhost:3000/${user.image}`}
+                        src={
+                          imagePreview || `http://localhost:3000/${user.image}`
+                        }
                         alt="Profile"
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
@@ -225,14 +247,18 @@ const handleDeleteAccount = async () => {
                   <div className="text-center">
                     <div className="flex items-center gap-1 text-blue-600">
                       <ShoppingBag className="w-4 h-4" />
-                      <span className="font-bold text-lg">{purchaseOrders.length}</span>
+                      <span className="font-bold text-lg">
+                        {purchaseOrders.length}
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600">Purchases</p>
                   </div>
                   <div className="text-center">
                     <div className="flex items-center gap-1 text-green-600">
                       <Home className="w-4 h-4" />
-                      <span className="font-bold text-lg">{rentOrders.length}</span>
+                      <span className="font-bold text-lg">
+                        {rentOrders.length}
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600">Rentals</p>
                   </div>
@@ -346,14 +372,16 @@ const handleDeleteAccount = async () => {
           {/* Purchase Orders */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full -translate-y-16 translate-x-16 opacity-30"></div>
-            
+
             <div className="relative z-10">
               <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
                   <ShoppingBag className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800">Purchase Orders</h2>
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Purchase Orders
+                  </h2>
                   <p className="text-gray-600">Your shopping history</p>
                 </div>
               </div>
@@ -406,8 +434,12 @@ const handleDeleteAccount = async () => {
                     <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Package className="w-10 h-10 text-blue-600" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No purchase orders yet</h3>
-                    <p className="text-gray-600">Start shopping to see your orders here!</p>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      No purchase orders yet
+                    </h3>
+                    <p className="text-gray-600">
+                      Start shopping to see your orders here!
+                    </p>
                   </div>
                 )}
               </div>
@@ -417,14 +449,16 @@ const handleDeleteAccount = async () => {
           {/* Rent Orders */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-full -translate-y-16 translate-x-16 opacity-30"></div>
-            
+
             <div className="relative z-10">
               <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg">
                   <Clock className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800">Rent Orders</h2>
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Rent Orders
+                  </h2>
                   <p className="text-gray-600">Your rental history</p>
                 </div>
               </div>
@@ -477,8 +511,12 @@ const handleDeleteAccount = async () => {
                     <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Clock className="w-10 h-10 text-green-600" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No rent orders yet</h3>
-                    <p className="text-gray-600">Start renting to see your orders here!</p>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                      No rent orders yet
+                    </h3>
+                    <p className="text-gray-600">
+                      Start renting to see your orders here!
+                    </p>
                   </div>
                 )}
               </div>
@@ -486,7 +524,7 @@ const handleDeleteAccount = async () => {
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
