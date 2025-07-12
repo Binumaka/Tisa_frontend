@@ -189,6 +189,13 @@ const OrnamentDetails = () => {
                 </div>
               </div>
 
+              <div className="flex items-center gap-14">
+                <div className="flex w-[130px] h-[45px] rounded-lg items-center mt-6 gap-6 mb-6 border border-green-300">
+                  <strong className="font-dosis"></strong>{" "}
+                  {ornament.available || "N/A"}
+                </div>
+                </div>
+
               <div className="flex items-center gap-14 mb-6">
                 <div className="flex w-[150px] h-[45px] px-2 rounded-lg items-center mt-6 gap-6 mb-6 border border-gray-300">
                   <button
