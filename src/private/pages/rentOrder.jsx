@@ -133,7 +133,7 @@ const RentCheckoutPage = () => {
   return (
     <div className="min-h-screen">
       <NavBar />
-      <div className="container mx-auto py-8 mt-20 flex flex-col">
+      <div className="mx-auto py-8 mt-20 flex flex-col">
         <div className="relative mb-8">
           <div
             className="text-white text-2xl font-dosis py-3 px-4 w-[200px]"

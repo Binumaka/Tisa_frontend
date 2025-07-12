@@ -69,7 +69,7 @@ const RentOrderList = () => {
   return (
     <div className="min-h-screen">
       <NavBar />
-      <div className="container mt-20 mx-auto py-6">
+      <div className="mt-20 mx-auto py-6">
         <div className="flex items-center gap-4 mb-8">
           <div
             className="text-white text-2xl font-dosis py-4 px-6 w-[200px]"

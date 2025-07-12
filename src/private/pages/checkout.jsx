@@ -147,7 +147,7 @@ const CheckoutPage = () => {
   return (
     <div className="bg-white min-h-screen">
       <NavBar />
-      <div className="container mt-20 mx-auto py-6 flex flex-col">
+      <div className="mt-20 mx-auto py-6 flex flex-col">
         <div className="relative">
           <div
             className="text-white text-2xl font-dosis py-3 px-8 w-[200px]"

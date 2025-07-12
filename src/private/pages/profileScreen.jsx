@@ -202,7 +202,7 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar />
 
-      <div className="container mt-20 mx-auto px-4 py-8 max-w-7xl">
+      <div className="mt-20 mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 relative overflow-hidden">
           {/* Background Pattern */}

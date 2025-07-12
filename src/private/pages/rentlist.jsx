@@ -30,16 +30,16 @@ const RentDisplay = () => {
   return (
     <div>
       <NavBar />
-      <div className="container mx-auto mt-20 py-8">
+      <div className="mx-auto mt-20 py-8">
         <div
-        className="text-white text-2xl font-junge py-3 px-4 w-[200px]"
+        className="text-white text-2xl font-junge py-3 px-4 w-[250px]"
         style={{
           backgroundColor: "#9f7878",
           clipPath:
             "polygon(0 0, calc(100% - 30px) 0, 100% 50%, calc(100% - 30px) 100%, 0 100%)",
         }}
       >
-        Rent
+        Rent Ornaments
       </div>
         <RentCard ornaments={ornaments} />
       </div>

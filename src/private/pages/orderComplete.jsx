@@ -54,7 +54,7 @@ const OrderCompletePage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar />
-      <div className="container mt-20 mx-auto py-6">
+      <div className="mt-20 mx-auto py-6">
         <div
           className="text-white text-2xl font-dosis font-medium py-3 px-3 w-[230px] mb-4"
           style={{

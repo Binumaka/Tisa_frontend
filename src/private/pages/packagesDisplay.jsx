@@ -30,7 +30,7 @@ const PackageDisplay = () => {
   return (
     <div>
       <NavBar />
-      <div className="container mx-auto mt-20 py-8">
+      <div className="mx-auto mt-20 py-8">
         <div
         className="text-white text-2xl font-dosis py-3 px-8 w-[200px]"
         style={{

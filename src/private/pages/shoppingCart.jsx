@@ -47,7 +47,7 @@ const CartScreen = () => {
   return (
     <div className="bg-[#fdfafa] min-h-screen">
       <Navbar />
-      <div className="container mx-auto mt-20 py-8">
+      <div className="mx-auto mt-20 py-8">
         <div className="flex justify-between items-center mb-10">
           <div className="relative">
             <div

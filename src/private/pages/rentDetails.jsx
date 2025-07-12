@@ -34,7 +34,7 @@ const RentDetailsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar />
-      <div className="max-w-6xl mx-auto px-4 mt-28 mb-12 grid md:grid-cols-2 gap-8">
+      <div className=" mx-auto px-4 mt-28 mb-12 grid md:grid-cols-2 gap-8">
         {/* Left - Image */}
         <div className="flex justify-center">
           <div className="relative w-full max-w-md">

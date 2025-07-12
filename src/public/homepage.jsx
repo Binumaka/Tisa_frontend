@@ -16,17 +16,17 @@ const SplashPage = () => {
     },
     {
       id: 2,
-      title: "Discover the best of Bhaktapur",
+      title: "Discover the best ornament",
       image: "/src/assets/images/gufa.png",
     },
     {
       id: 3,
-      title: "Trip to the Wildlife",
+      title: "What is wore in Gufa ceremony",
       image: "/src/assets/images/mariage.png",
     },
     {
       id: 4,
-      title: "Winter in Mustang",
+      title: "Discover the jewellery wore in janku",
       image: "/src/assets/images/janku.png",
     },
   ];
@@ -47,7 +47,7 @@ const SplashPage = () => {
     },
     {
       id: 4,
-      image: "/src/assets/images/Naypushikha.png",
+      image: "/src/assets/images/Nyapushikha2.png",
     },
   ];
 
@@ -149,7 +149,7 @@ const SplashPage = () => {
             {[
               { src: "/src/assets/images/tayo2.png" },
               { src: "/src/assets/images/makasi1.png" },
-              { src: "/src/assets/images/naypushikha1.png" },
+              { src: "/src/assets/images/nyapushikha1.png" },
             ].map((item, index) => (
               <div
                 key={index}

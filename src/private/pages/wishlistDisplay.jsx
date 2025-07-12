@@ -31,7 +31,7 @@ const WishListScreen = () => {
   return (
     <div className="min-h-screen bg-[#fdfafa]">
       <Navbar />
-      <div className="container mx-auto mt-20 py-8">
+      <div className="mx-auto mt-20 py-8">
         <div className="flex justify-between items-center mb-10">
           <div className="relative">
             <div

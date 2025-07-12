@@ -66,7 +66,7 @@ const OrderList = () => {
   return (
     <div className="min-h-screen font-dosis">
       <NavBar />
-      <div className="container mt-20 mx-auto py-6">
+      <div className="mt-20 mx-auto py-6">
         <div className="flex items-center gap-4 mb-8">
           <div
             className="text-white font-dosis w-[160px] text-2xl py-2 px-6"
